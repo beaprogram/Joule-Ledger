@@ -1,9 +1,5 @@
 # Dashboard — Joule Ledger
 
-## Walkthrough video
-
-*(Add link here once recorded — a two-minute screen recording demonstrating all five pages.)*
-
 ---
 
 ## Pages
