@@ -1,0 +1,16 @@
+[
+  {
+    "plan_filing_id": "2026-ext",
+    "plan_year": null,
+    "program_name_raw": "__PDF_NOT_FOUND__",
+    "target_gj": null,
+    "target_gwh_electric": null,
+    "target_mw": null,
+    "target_tonnes_co2e": null,
+    "target_spend_cad": null,
+    "target_participants": null,
+    "is_manually_entered": false,
+    "source_page": null,
+    "source_path": "data/raw/dsm_plans/DSM_Plan_2026_Extension.pdf"
+  }
+]

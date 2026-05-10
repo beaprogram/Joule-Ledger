@@ -1,0 +1,29 @@
+program_id,canonical_name,raw_name_variants,prior_names,category,funding_source,is_low_income,is_active,valid_from,valid_to
+P001,Home Energy Assessment,Home Energy Assessment|Home Energy Assessments|Residential Energy Assessment,,Residential,DSM-Electric,0,1,2019,
+P002,Instant Savings / Appliance Rebates,Instant Savings|Appliance Retirement|Efficient Products|Retail Products Program|Energy Efficient Products,Efficient Products,Residential,DSM-Electric,0,1,2019,
+P003,Efficient Product Installation,Efficient Product Installation|Product Installation,,Residential,DSM-Electric,0,1,2019,
+P004,Residential New Construction,New Home Construction|Residential New Construction|New Construction – Residential,,Residential,DSM-Electric,0,0,2019,2023
+P005,Business Energy Rebates,Business Energy Rebates|Commercial Building Retrofit|Commercial Buildings|Commercial Retrofit,,Commercial,DSM-Electric,0,1,2019,
+P006,Custom (Large Projects),Custom|Commercial New Construction,,Commercial,DSM-Electric,0,1,2019,
+P007,Small Business Energy Solutions,Small Business Energy Solutions|Small Business Program|Small Business Energy Solutions (Non-Electric)|Small Business Energy Solutions (non-electric)|Small Business Energy Solutions (Non-electric),,Commercial,DSM-Electric,0,1,2019,
+P008,Strategic Energy Management,Strategic Energy Management|Energy Management Information Systems|Strategic Energy Management and Energy Management Information Systems|Strategic Energy Management and Energy Management Information Systems (EMIS),Energy Management Information Systems,Commercial,DSM-Electric,0,1,2019,
+P009,HomeWarming,HomeWarming|Home Warming,Low-Income Efficiency,Low-Income,DSM-Electric,1,1,2019,
+P010,Green Heat,Green Heat|Home Heating Conversion|Oil to Heat Pump|Oil to Heat Pump Affordability|Fuel Switching – Residential,,Residential,DSM-Electric,0,1,2019,
+P011,Canada Greener Homes,Canada Greener Homes Grant|Greener Homes|Canada Greener Homes,,Residential,Federal,0,1,2021,
+P012,Low-Income Energy Efficiency Program,Low-Income Energy Efficiency Program|LEEP|Low-Income EEP|Low Income Homeowner Service,,Low-Income,Province,1,1,2019,
+P013,Mi'kmaw Home Energy Efficiency Project,Mi'kmaw Home Energy Efficiency Project|Mikmaw Home Energy Efficiency Project|Mi'kmaw Home Energy Efficiency,,Low-Income,Province,1,1,2019,
+P014,Affordable Multifamily Housing and Non-Profits,Affordable Multifamily Housing and Non-Profits|Affordable Multifamily Housing|Affordable Multi-Family|Low-Income Multifamily|Affordable Multi-Family Housing|Affordable Multifamily Housing and Non-Profits,,Low-Income,Province,1,1,2019,
+P015,SolarHomes,SolarHomes|Solar Homes|Solar Homes Program,,Residential,DSM-Electric,0,1,2019,
+P016,Solar PV for Non-Profits,Solar PV for Non-Profits|Solar PV – Non-Profits,,Commercial,DSM-Electric,0,1,2021,
+P017,Residential Behaviour,Residential Behaviour|Behaviour Change|Residential Behaviour Program,,Residential,DSM-Electric,0,1,2023,
+P018,Community Efficiency Financing,Community Efficiency Financing|CEF,,Residential,Province,0,1,2022,
+P019,Electric Vehicle Charging,Electric Vehicle Program|EV Charging|Electric Vehicle Charging,,Other,DSM-Electric,0,0,2020,2022
+P020,Industrial Efficiency,Industrial Efficiency|Large Industrial|Industrial Program|Industrial Process Optimization|Process Improvement,,Industrial,DSM-Electric,0,1,2019,
+P021,Demand Response,Demand Response|Demand Response Program|Peak Load Management,,Industrial,DSM-Electric,0,1,2019,
+P022,Agricultural Efficiency,Agricultural Efficiency|Farm Efficiency|Agriculture Program,,Commercial,DSM-Electric,0,0,2019,2022
+P023,Commercial HVAC / Lighting,Commercial Lighting|HVAC – Commercial|Commercial Heating and Cooling|Commercial HVAC|LED Lighting Commercial,,Commercial,DSM-Electric,0,1,2019,
+P024,Low-Income Multi-Residential,Low-Income Multi-Residential|Low Income Apartments|Affordable Multi-Residential,,Low-Income,Province,1,1,2021,
+P025,Building Automation Systems,Building Automation Systems|BAS Program|Smart Building Controls,,Commercial,DSM-Electric,0,1,2020,
+P026,Thermal Energy Storage,Thermal Energy Storage|TES Program,,Industrial,DSM-Electric,0,1,2023,
+P027,Remote Community Efficiency,Remote Community Efficiency|Remote Communities,,Other,Province,0,1,2022,
+P028,Innovation Fund,Innovation Fund|Emerging Technology|R&D Program,,Other,DSM-Electric,0,0,2019,2022
