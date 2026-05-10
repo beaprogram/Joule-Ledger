@@ -26,7 +26,7 @@ import streamlit as st
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Joule Ledger",
-    page_icon="⚡",
+    page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -76,26 +76,41 @@ def q(sql: str, params: tuple = ()) -> pd.DataFrame:
 
 # ── Sidebar navigation ────────────────────────────────────────────────────────
 PAGES = {
-    "⚡ Executive Summary":           "executive",
-    "📊 Plan vs. Actual":             "plan_actual",
-    "🏠 Equity Lens":                 "equity",
-    "🌤 Weather-Normalized":          "weather",
-    "📖 Methodology & Source Map":    "methodology",
+    "Executive Summary":        "executive",
+    "Plan vs. Actual":          "plan_actual",
+    "Equity Lens":              "equity",
+    "Weather-Normalized":       "weather",
+    "Methodology & Source Map": "methodology",
 }
 
 with st.sidebar:
-    st.image(
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/"
-        "Nova_Scotia_coat_of_arms.svg/120px-Nova_Scotia_coat_of_arms.svg.png",
-        width=60,
+    st.markdown(
+        """
+        <div style="
+            background: linear-gradient(135deg, #1B6CA8 0%, #0D4F7C 100%);
+            border-radius: 8px;
+            padding: 20px 16px 16px 16px;
+            margin-bottom: 4px;
+        ">
+            <div style="color:#FFFFFF; font-size:22px; font-weight:700;
+                        letter-spacing:0.5px; line-height:1.2;">
+                Joule Ledger
+            </div>
+            <div style="color:#B8D4EE; font-size:11px; margin-top:6px;
+                        line-height:1.5; font-weight:400;">
+                Six-year audit of Efficiency Nova Scotia<br>plan vs. performance
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    st.title("Joule Ledger")
-    st.caption("Six-year audit of Efficiency Nova Scotia  \nplan vs. performance")
     st.divider()
     page = st.radio("Navigate", list(PAGES.keys()), label_visibility="collapsed")
     st.divider()
-    st.caption("Data: EfficiencyOne Annual Reports 2022–2024  \n"
-               "ECCC weather · NS Power rates")
+    st.caption(
+        "Data: EfficiencyOne Annual Reports 2022–2024  \n"
+        "ECCC weather · NS Power rates"
+    )
 
 page_key = PAGES[page]
 
@@ -130,12 +145,13 @@ if page_key == "executive":
     # Annual GWh bar ──────────────────────────────────────────────────────────
     with col_l:
         st.subheader("Annual Electricity Savings (GWh)")
+        totals["year_str"] = totals["year"].astype(str)
         fig = px.bar(
             totals,
-            x="year", y="total_actual_gwh_electric",
+            x="year_str", y="total_actual_gwh_electric",
             text_auto=".1f",
             color_discrete_sequence=[BLUE],
-            labels={"year": "Year", "total_actual_gwh_electric": "GWh"},
+            labels={"year_str": "Year", "total_actual_gwh_electric": "GWh"},
         )
         fig.update_traces(textposition="outside")
         fig.update_layout(
@@ -151,10 +167,10 @@ if page_key == "executive":
         st.subheader("Annual GHG Avoided (tonnes CO₂e)")
         fig2 = px.bar(
             totals,
-            x="year", y="total_actual_tonnes_co2e",
+            x="year_str", y="total_actual_tonnes_co2e",
             text_auto=".0f",
             color_discrete_sequence=[TEAL],
-            labels={"year": "Year", "total_actual_tonnes_co2e": "tonnes CO₂e"},
+            labels={"year_str": "Year", "total_actual_tonnes_co2e": "tonnes CO₂e"},
         )
         fig2.update_traces(textposition="outside")
         fig2.update_layout(
@@ -177,11 +193,12 @@ if page_key == "executive":
         ORDER BY a.year, p.category
     """)
     if not cat_df.empty:
+        cat_df["year_str"] = cat_df["year"].astype(str)
         fig3 = px.bar(
-            cat_df, x="year", y="gwh", color="category",
+            cat_df, x="year_str", y="gwh", color="category",
             barmode="stack", text_auto=".0f",
             color_discrete_map=CAT_COLOURS,
-            labels={"year": "Year", "gwh": "GWh", "category": "Category"},
+            labels={"year_str": "Year", "gwh": "GWh", "category": "Category"},
         )
         fig3.update_layout(
             plot_bgcolor="white", paper_bgcolor="white",
@@ -337,9 +354,10 @@ elif page_key == "equity":
         if not all_actuals.empty:
             share_df = all_actuals.copy()
             share_df["non_li_gwh"] = share_df["total_gwh"] - share_df["li_gwh"]
+            share_df["year_str"] = share_df["year"].astype(str)
             share_long = pd.melt(
-                share_df[["year", "li_gwh", "non_li_gwh"]],
-                id_vars="year",
+                share_df[["year_str", "li_gwh", "non_li_gwh"]],
+                id_vars="year_str",
                 value_vars=["li_gwh", "non_li_gwh"],
                 var_name="type", value_name="gwh",
             )
@@ -347,10 +365,10 @@ elif page_key == "equity":
                 {"li_gwh": "Low-Income", "non_li_gwh": "All Other Programs"}
             )
             fig = px.bar(
-                share_long, x="year", y="gwh", color="type",
+                share_long, x="year_str", y="gwh", color="type",
                 barmode="stack",
                 color_discrete_map={"Low-Income": "#9B59B6", "All Other Programs": "#1B6CA8"},
-                labels={"year": "Year", "gwh": "GWh", "type": ""},
+                labels={"year_str": "Year", "gwh": "GWh", "type": ""},
                 text_auto=".1f",
             )
             fig.update_layout(
