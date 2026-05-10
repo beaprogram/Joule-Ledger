@@ -1,7 +1,5 @@
 # Dashboard — Joule Ledger
 
----
-
 ## Pages
 
 ### 1. Executive Summary
