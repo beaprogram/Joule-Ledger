@@ -131,7 +131,7 @@ No cloud accounts, no API keys, no paid software.
 
 ```bash
 # 1. Clone and enter the repo
-git clone https://github.com/<your-handle>/joule-ledger.git
+git clone https://github.com/beaprogram/Joule-Ledger.git
 cd joule-ledger
 
 # 2. Set up a virtual environment
