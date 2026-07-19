@@ -20,6 +20,8 @@ data/interim/
 # Warehouse is regenerable — but commit it so Streamlit Cloud works without PDFs
 # Uncomment the next line if you want to exclude it:
 # data/warehouse.db
+*.db-shm
+*.db-wal
 
 # OS
 .DS_Store
