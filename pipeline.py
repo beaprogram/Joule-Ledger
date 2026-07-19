@@ -69,10 +69,10 @@ def run_validate() -> None:
     failures: list[str] = []
 
     checks = [
-        _check_headline_reconciliation,
+        _check_energy_metrics,
         _check_no_nulls,
         _check_program_ids,
-        _check_row_counts_nondecreasing,
+        _check_no_exact_duplicate_facts,
         _check_active_programs_open,
     ]
     for check in checks:
@@ -95,43 +95,56 @@ def run_validate() -> None:
 # Validation helpers
 # ---------------------------------------------------------------------------
 
-def _check_headline_reconciliation(con) -> dict:
-    rows = con.execute(
+def _check_energy_metrics(con) -> dict:
+    row_count, year_count = con.execute(
+        "SELECT COUNT(*), COUNT(DISTINCT year) FROM fact_actuals"
+    ).fetchone()
+    empty_metrics = con.execute(
         """
-        SELECT year, SUM(actual_gj) AS total_gj
+        SELECT COUNT(*)
         FROM fact_actuals
-        GROUP BY year
-        ORDER BY year
+        WHERE actual_gj IS NULL
+          AND actual_gwh_electric IS NULL
+          AND actual_mw IS NULL
+          AND actual_tonnes_co2e IS NULL
         """
-    ).fetchall()
-    max_dev = 0.0
-    for year, total_gj in rows:
-        if total_gj and total_gj > 0:
-            pass  # placeholder — real check compares to published headline
+    ).fetchone()[0]
+    negative_metrics = con.execute(
+        """
+        SELECT COUNT(*)
+        FROM fact_actuals
+        WHERE COALESCE(actual_gj, 0) < 0
+           OR COALESCE(actual_gwh_electric, 0) < 0
+           OR COALESCE(actual_mw, 0) < 0
+           OR COALESCE(actual_tonnes_co2e, 0) < 0
+        """
+    ).fetchone()[0]
+    passed = row_count > 0 and empty_metrics == 0 and negative_metrics == 0
     return {
-        "name": "actual_gj reconciles to public headline (±2%)",
-        "pass": True,
-        "detail": f"Max deviation 0.7% (2021) — {len(rows)} years checked",
+        "name": "Loaded actuals contain valid, non-negative energy metrics",
+        "pass": passed,
+        "detail": (
+            f"{row_count} rows across {year_count} years; "
+            f"{empty_metrics} rows without energy metrics; "
+            f"{negative_metrics} rows with negative metrics"
+        ),
     }
 
 
 def _check_no_nulls(con) -> dict:
     # actual_participants and actual_spend_cad are not reported in Annual Report
     # tables, so they are legitimately NULL. Only check the core energy metric.
-    measured = [
-        ("fact_actuals", "actual_gj"),
-        ("fact_targets", "target_gj"),
-    ]
+    measured = [("fact_actuals", "actual_gj")]
+    target_rows = con.execute("SELECT COUNT(*) FROM fact_targets").fetchone()[0]
+    if target_rows:
+        measured.append(("fact_targets", "target_gj"))
     bad = []
     for table, col in measured:
-        try:
-            count = con.execute(
-                f"SELECT COUNT(*) FROM {table} WHERE {col} IS NULL AND is_manually_entered = 0"
-            ).fetchone()[0]
-            if count:
-                bad.append(f"{table}.{col}: {count} nulls")
-        except Exception:
-            pass
+        count = con.execute(
+            f"SELECT COUNT(*) FROM {table} WHERE {col} IS NULL AND is_manually_entered = 0"
+        ).fetchone()[0]
+        if count:
+            bad.append(f"{table}.{col}: {count} nulls")
     return {
         "name": "No unexpected nulls in fact table measured columns",
         "pass": len(bad) == 0,
@@ -140,20 +153,17 @@ def _check_no_nulls(con) -> dict:
 
 
 def _check_program_ids(con) -> dict:
-    try:
-        orphans = con.execute(
-            """
-            SELECT COUNT(*) FROM (
-                SELECT program_id FROM fact_actuals
-                UNION ALL
-                SELECT program_id FROM fact_targets
-            ) f
-            LEFT JOIN dim_program p USING (program_id)
-            WHERE p.program_id IS NULL
-            """
-        ).fetchone()[0]
-    except Exception:
-        orphans = 0
+    orphans = con.execute(
+        """
+        SELECT COUNT(*) FROM (
+            SELECT program_id FROM fact_actuals
+            UNION ALL
+            SELECT program_id FROM fact_targets
+        ) f
+        LEFT JOIN dim_program p USING (program_id)
+        WHERE p.program_id IS NULL
+        """
+    ).fetchone()[0]
     return {
         "name": "Every fact row has a valid program_id in dim_program",
         "pass": orphans == 0,
@@ -161,24 +171,64 @@ def _check_program_ids(con) -> dict:
     }
 
 
-def _check_row_counts_nondecreasing(con) -> dict:
+def _check_no_exact_duplicate_facts(con) -> dict:
+    duplicate_actuals = con.execute(
+        """
+        SELECT COUNT(*) FROM (
+            SELECT
+                program_id,
+                year,
+                actual_gj,
+                actual_gwh_electric,
+                actual_mw,
+                actual_tonnes_co2e,
+                actual_spend_cad,
+                actual_participants,
+                source_page,
+                source_url
+            FROM fact_actuals
+            GROUP BY
+                program_id,
+                year,
+                actual_gj,
+                actual_gwh_electric,
+                actual_mw,
+                actual_tonnes_co2e,
+                actual_spend_cad,
+                actual_participants,
+                source_page,
+                source_url
+            HAVING COUNT(*) > 1
+        )
+        """
+    ).fetchone()[0]
+    duplicate_targets = con.execute(
+        """
+        SELECT COUNT(*) FROM (
+            SELECT program_id, year, plan_filing_id
+            FROM fact_targets
+            GROUP BY program_id, year, plan_filing_id
+            HAVING COUNT(*) > 1
+        )
+        """
+    ).fetchone()[0]
     return {
-        "name": "Row counts per source per year are non-decreasing on refresh",
-        "pass": True,
-        "detail": "Pass on most recent refresh",
+        "name": "No exact duplicate fact records exist",
+        "pass": duplicate_actuals == 0 and duplicate_targets == 0,
+        "detail": (
+            f"{duplicate_actuals} duplicate actual groups; "
+            f"{duplicate_targets} duplicate target groups"
+        ),
     }
 
 
 def _check_active_programs_open(con) -> dict:
-    try:
-        bad = con.execute(
-            """
-            SELECT COUNT(*) FROM dim_program
-            WHERE is_active = 1 AND valid_to IS NOT NULL
-            """
-        ).fetchone()[0]
-    except Exception:
-        bad = 0
+    bad = con.execute(
+        """
+        SELECT COUNT(*) FROM dim_program
+        WHERE is_active = 1 AND valid_to IS NOT NULL
+        """
+    ).fetchone()[0]
     return {
         "name": "Every active program has valid_to = NULL in program_mapping",
         "pass": bad == 0,

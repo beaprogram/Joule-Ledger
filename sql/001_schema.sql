@@ -44,7 +44,8 @@ CREATE TABLE IF NOT EXISTS dim_rate (
 -- FACT TABLES
 -- ============================================================
 
--- Granularity: one row per (program, year).
+-- Granularity: one row per extracted source measurement. A program/year can have
+-- separate electric and non-electric rows or multiple source table rows.
 -- Measures represent delivered actuals from Annual Reports.
 CREATE TABLE IF NOT EXISTS fact_actuals (
     id                      INTEGER PRIMARY KEY AUTOINCREMENT,
